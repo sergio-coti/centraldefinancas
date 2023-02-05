@@ -1,3 +1,17 @@
 ﻿@{
-    Layout = "_Layout";
+    //capturar o nome do controlador acessado pela aplicação
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+
+    //verificando o nome do controlador
+    //para definir qual será o layout da página
+    switch(controllerName)
+    {
+        case "Account":
+            Layout = "~/Views/Shared/_Layout.cshtml";
+            break;
+
+        case "Dashboard":
+            Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+            break;
+    }
 }

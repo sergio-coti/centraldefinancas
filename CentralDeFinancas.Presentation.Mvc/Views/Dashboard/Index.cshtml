@@ -1,0 +1,92 @@
+﻿<div class="row">
+    <div class="col-md-4">
+
+        <h4>Cadastre uma conta:</h4>
+        <hr />
+
+        <div class="mb-2">
+            <label>Nome da conta:</label>
+            <input type="text" class="form-control" id="nomeConta" />
+        </div>
+
+        <div class="mb-2">
+            <label>Valor da conta:</label>
+            <input type="text" class="form-control" id="valorConta" />
+        </div>
+
+        <div class="mb-2">
+            <label>Tipo da conta:</label>
+            <select class="form-select" id="tipoConta">
+                <option value="1">Conta a Receber</option>
+                <option value="2">Conta a Pagar</option>
+            </select>
+        </div>
+
+        <div class="mb-2 d-grid">
+            <button id="btnCadastro" class="btn btn-success">
+                Realizar Cadastro
+            </button>
+        </div>
+
+    </div>
+    <div class="col-md-8">
+
+        <table id="contas" class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th>Nome da conta</th>
+                    <th>Valor</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+
+            const connection = new signalR.HubConnectionBuilder().withUrl("/mainhub").build();
+            connection.start().catch(e => console.log(e));
+
+            connection.on('ReceiveMessage', (model) => {
+                
+                var tipo = model.tipoConta == 1 ? "RECEBER" : "PAGAR";
+
+                var data = "<tr>";
+                data += "<td>" + model.nomeConta + "</td>";
+                data += "<td>" + model.valorConta + "</td>";
+                data += "<td>" + tipo + "</td>";
+                data += "</tr>";
+
+                $("#contas tbody").append(data);
+            });
+
+            $("#btnCadastro").click(function(){
+                
+                var model = {
+                    nomeConta: $("#nomeConta").val(),
+                    valorConta: $("#valorConta").val(),
+                    tipoConta: parseInt($("#tipoConta").val())
+                };               
+
+                connection.invoke("CadastroDeContas", model);
+
+                $(".form-control").val('');
+                $(".form-select").val('1');
+
+                alert('Conta cadastrada com sucesso!');
+            })
+        })
+    </script>
+
+}
